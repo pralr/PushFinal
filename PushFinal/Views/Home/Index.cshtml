@@ -1,0 +1,51 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<!--manifest temporariamente referenciado em shared-->
+
+<div class="text-center">
+   
+
+    <div id="android_area" style="display: none;">
+        <h1>Web Push Notification - Android Area</h1>
+        <button id="subscribeButton" onclick="androidInscricaoPush()">Subscribe to Push Notifications</button>
+        <button id="unsubscribeButton" onclick="androidDeletaInscricaoPush()" disabled>Unsubscribe from Push Notifications</button>
+        <button id="notifyMeButton" onclick="NotificaPosicaoDoSw()">Notify Me</button>
+        <br />
+    </div>
+
+    <div id="ios_area" style="display: none;">
+        <h1>Web Push Notification - Iphone Area</h1>
+        <button id="subscribeButtonIOS" onclick="iosInscricaoPush()">Subscribe to Push Notifications</button>
+        <button id="unsubscribeButtonIOS" onclick="iosDeletaInscricaoPush()" disabled>Unsubscribe from Push Notifications</button>
+        <button id="notifyMeButtonIOS" onclick="NotificaPosicaoDoSw()">Notify Me</button>
+        <br />
+    </div>
+
+ 
+</div>
+
+<script>
+    var isAndroid = /Android/.test(navigator.platform);
+    var isIOS = /iPad|iPhone|iPod/.test(navigator.platform);
+
+    if (isAndroid) {
+        document.getElementById('android_area').style.display = 'block';
+        loadScript('js/pushAndroid.js');
+    } else if (isIOS) {
+        document.getElementById('ios_area').style.display = 'block';
+        loadScript('js/pushIOS.js');
+    } else {
+        // Carregar o arquivo padrão para outros sistemas operacionais, se necessário
+        document.getElementById('android_area').style.display = 'block';
+        loadScript('js/pushAndroid.js');
+    }
+
+    function loadScript(scriptName) {
+        var script = document.createElement('script');
+        script.src = scriptName;
+        document.head.appendChild(script);
+    }
+
+</script>
