@@ -3,43 +3,45 @@ var btnExcluiInscricao = document.getElementById("unsubscribeButtonIOS");
 var sw, sb;
 
 if ('serviceWorker' in navigator) {
-
-    let swRegistration = await navigator.serviceWorker.register('/js/service-worker.js');
-    let pushManager = swRegistration.pushManager;
-
-    if (!pushAtivo(pushManager)) {
-        return;
-    }
-
-    var permissionState = await pushManager.permissionState({ userVisibleOnly: true });
-
-    await permiteInscricaoBotoes();
-  
+    registraSw();
 }
 
+async function registraSw() {
+
+    navigator.serviceWorker.register('/js/service-worker.js').then(async serviceWorker => {
+
+        if (!pushAtivo(serviceWorker.pushManager)) {
+            return;
+        }
+
+        subscription = await serviceWorker.pushManager.getSubscription();
+        sw = serviceWorker;
+        sb = subscription;
+
+        await permiteInscricaoBotoes();
+
+    })
+}
 
 async function iosInscricaoPush() {
-
-    const response = await fetch('api/push/publickey');
-    const publicKey = await response.json();
-
-    let swRegistration = await navigator.serviceWorker.getRegistration();
-    let pushManager = swRegistration.pushManager;
-
-    if (!pushAtivo(pushManager)) {
-        return;
-    }
-
-    let subscriptionOptions = {
-        userVisibleOnly: true,
-        applicationServerKey: publicKey
-    };
-
-    try {
-        sb = await pushManager.subscribe(subscriptionOptions);
+    let pushManager = (await navigator.serviceWorker.register('/js/service-worker.js')).pushManager;
+    let temPermissao = await pushManager.permissionState({ userVisibleOnly: true });
+    if (temPermissao) {
+        await criaSubscription(sb);
         await permiteInscricaoBotoes();
-    } catch (error) {
-        console.warn("Usuário negou a permissão", error);
+    }
+}
+
+async function criaSubscription(subscription) {
+    if (!subscription) {
+        const response = await fetch('api/push/publickey');
+        const data = await response.json();
+        sb = await sw.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: data.publicKey,
+        });
+    } else {
+        console.log("Inscrição já existe ou registro do service worker não encontrado.");
     }
 }
 
@@ -59,23 +61,18 @@ function pushAtivo(pushManager) {
     }
 }
 
+async function obtemSubscription() {
+    return await sw.pushManager.getSubscription();
+}
+
 async function permiteInscricaoBotoes() {
-
-    let swRegistration = await navigator.serviceWorker.register('/js/service-worker.js');
-    let subscription = swRegistration.pushManager.getSubscription();
-
+    let subscription = await obtemSubscription();
     if (subscription == null || subscription == undefined) {
         btnInscricao.disabled = false;
-        btnInscricao.style.display = "block";
-
         btnExcluiInscricao.disabled = true;
-        btnExcluiInscricao.style.display = "none";
-
     } else {
         btnInscricao.disabled = true;
-        btnInscricao.style.display = "none";
-
         btnExcluiInscricao.disabled = false;
-        btnExcluiInscricao.style.display = "block";
     }
 }
+

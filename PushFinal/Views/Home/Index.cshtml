@@ -23,12 +23,20 @@
         <br />
     </div>
 
+  @*   <h1>Web Push Notification - Iphone Area</h1>
+        <button id="subscribeButtonIOS" onclick="iosInscricaoPush()">Subscribe to Push Notifications</button>
+        <button id="unsubscribeButtonIOS" onclick="iosDeletaInscricaoPush()" disabled>Unsubscribe from Push Notifications</button>
+        <button id="notifyMeButtonIOS" onclick="NotificaPosicaoDoSw()">Notify Me</button>
+        <br />
+ *@
  
 </div>
 
 <script>
     var isAndroid = /Android/.test(navigator.platform);
     var isIOS = /iPad|iPhone|iPod/.test(navigator.platform);
+
+    //loadScript('js/pushIOS.js');
 
     if (isAndroid) {
         document.getElementById('android_area').style.display = 'block';

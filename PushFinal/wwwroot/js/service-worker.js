@@ -17,6 +17,10 @@ self.addEventListener('push', function (event) {
 
 //setInterval(noticaPosicaoDoSw, 5000);
 
+self.addEventListener('activate', event => {
+    event.waitUntil(NotificaPosicaoDoSw());
+});
+
 async function NotificaPosicaoDoSw() {
     if (sb) {
         try {
